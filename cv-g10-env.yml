@@ -1,7 +1,12 @@
 # Last update: 08/04/2025
 name: cv-g10-env
 dependencies:
-- torch
-- torchvision
-- opencv-python
-- h5py
+  - pip:
+    - torch==2.6.0
+    - torchvision==0.21.0
+    - h5py==3.13.0
+    - nltk==3.9.1
+    - tqdm==4.67.1
+    - imageio==2.37.0
+    - numpy==2.2.4
+    - pillow==11.1.0
