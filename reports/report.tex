@@ -76,7 +76,9 @@ Chúng tôi sẽ sử dụng một mạng CNN để trích xuất đặc trưng 
 Ở đây chúng tôi sẽ sử dụng ResNet-101 để trích xuất đặc trưng từ ảnh. ResNet-101 là một mạng nơ-ron tích chập sâu với 101 lớp, giúp cải thiện khả năng học và giảm thiểu vấn đề biến mất gradient. Chúng tôi sẽ sử dụng các lớp cuối cùng của ResNet-101 để lấy đặc trưng cho ảnh đầu vào.
 
 \subsubsection{Attention}
-Cài đặt cơ chế chú ý bằng các lớp tuyến tính đơn giản để mô hình học cách tập trung vào các phần quan trọng của ảnh khi tạo từng từ.
+Cài đặt cơ chế chú ý bằng các lớp tuyến tính đơn giản để mô hình học cách tập trung vào các phần quan trọng của ảnh khi tạo từng từ.\\
+Theo như tác giả Show, Attend and Tell, chúng tôi sẽ sử dụng cơ chế chú ý mềm (soft attention) để tính toán trọng số cho các phần khác nhau của ảnh. Cơ chế chú ý này sẽ giúp mô hình xác định vùng nào của ảnh là quan trọng nhất cho từng từ trong câu mô tả.\\
+Cơ chế chú ý sẽ được thực hiện bằng cách sử dụng một lớp tuyến tính để tính toán trọng số cho các đặc trưng của ảnh, sau đó kết hợp chúng với đầu vào của bộ giải mã. Trọng số này sẽ được cập nhật trong quá trình huấn luyện để tối ưu hóa mô hình.
 
 \subsubsection{Decoder}
 Sử dụng Long Short-Term Memory (LSTM) để tạo ra câu mô tả từ các đặc trưng đã được trích xuất và thông tin chú ý.
@@ -84,10 +86,10 @@ Sử dụng Long Short-Term Memory (LSTM) để tạo ra câu mô tả từ các
 \subsection{Hàm mất mát}
 Hàm mất mát được sử dụng trong mô hình này là hàm mất mát chéo entropy, giúp đo lường sự khác biệt giữa phân phối xác suất dự đoán và phân phối xác suất thực tế. Hàm mất mát này sẽ được tối ưu hóa trong quá trình huấn luyện để cải thiện độ chính xác của mô hình.
 
-\subsection{Đánh giá BLEU}
+\subsection{Đánh giá}
 
 Đánh giá mô hình sẽ được thực hiện bằng cách sử dụng chỉ số BLEU, một phương pháp phổ biến để đo lường chất lượng của các mô tả được tạo ra so với các mô tả tham chiếu. Chỉ số BLEU sẽ giúp chúng tôi đánh giá độ chính xác và tính tự nhiên của các câu mô tả.
-
+Ngoài ra, chúng tôi cũng sẽ sử dụng chỉ số METEOR để đánh giá chất lượng mô tả. Chỉ số này tính toán sự tương đồng giữa các từ trong câu được tạo ra và các từ trong câu tham chiếu, bao gồm cả các yếu tố ngữ nghĩa và ngữ pháp.
 
 \section{Kế hoạch}
 \subsection{Tổng quan}
@@ -111,9 +113,6 @@ Mô hình của chúng tôi sẽ sử dụng kiến trúc tương tự như "Sho
 \subsection{Cải tiến dự kiến}
 \begin{itemize}
     \item Thử nghiệm với các mạng CNN khác nhau cho Encoder (ResNet, Inception-v3)
-    \item Tích hợp beam search để cải thiện chất lượng mô tả được tạo ra
-    \item Fine-tuning encoder để nâng cao hiệu suất của mô hình
-    \item So sánh hiệu quả giữa mô hình có cơ chế chú ý và không có cơ chế chú ý
 \end{itemize}
 
 \section{Huấn luyện và phân tích mô hình}
@@ -128,15 +127,78 @@ Tuy nhiên, ở đây chúng tôi sẽ sử dụng bộ mô tả ảnh của And
     \item Thêm từ đặc biệt như <start> và <end> để đánh dấu bắt đầu và kết thúc của một mô tả.
 \end{itemize}
 
-\subsection{Các siêu tham số}
+\subsection{Kết quả đánh giá}
 
-\begin{itemize}
-    \item Learning rate: 0.001
-    \item Batch size: 32
-    \item Number of epochs: Do bị giới hạn về thời gian và không thể chạy trên GPU, chúng tôi sẽ dừng lại ở epoch 5.
-    \item Optimizer: Adam
-\end{itemize}
+Chúng tôi đã đánh giá mô hình trên tập dữ liệu Flickr8k sử dụng các chỉ số BLEU và METEOR. Kết quả đạt được với beam size là 1 như sau:
 
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Chỉ số} & \textbf{Giá trị} \\
+\hline
+BLEU-1 & 0.6282 \\
+\hline
+BLEU-2 & 0.4484 \\
+\hline
+BLEU-3 & 0.3108 \\
+\hline
+BLEU-4 & 0.2084 \\
+\hline
+METEOR & 0.4197 \\
+\hline
+\end{tabular}
+\caption{Kết quả đánh giá mô hình trên tập dữ liệu Flickr8k với beam size là 1}
+\label{tab:evaluation}
+\end{table}
+
+Các chỉ số BLEU đánh giá độ chính xác của n-grams (1, 2, 3, và 4 từ liên tiếp) trong câu được tạo ra so với câu tham chiếu. Chỉ số METEOR đánh giá dựa trên sự tương đồng của từng từ, đồng nghĩa, và các yếu tố ngôn ngữ học khác. Kết quả cho thấy mô hình của chúng tôi hoạt động tương đối tốt, đặc biệt với BLEU-1 và METEOR.
+
+\section{Cải tiến mô hình}
+\subsection{Các cải tiến đang thực hiện}
+
+Hiện tại, chúng tôi đang tiếp tục cải tiến mô hình để nâng cao hiệu suất và khả năng tạo sinh chú thích.
+
+\section{Thực nghiệm}
+Ở phần này, chúng tôi sẽ chạy thử nghiệm một vài mẫu ảnh để kiểm tra mô hình đã được huấn luyện. Chúng tôi sẽ sử dụng một số ảnh từ tập dữ liệu Flickr8k và một số ảnh ngẫu nhiên khác để kiểm tra khả năng tạo sinh chú thích của mô hình.
+\subsection{Thử nghiệm với các ảnh mẫu}
+
+\begin{center}
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{attachments/test00.jpg}
+        \vspace{0.2cm}
+        \textbf{Ảnh mẫu thử nghiệm 1}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{attachments/test00_caption.jpg}
+        \vspace{0.2cm}
+        \textbf{Chú thích được tạo ra cho ảnh mẫu 1}
+    \end{minipage}
+\end{center}
+
+\vspace{1cm}
+
+\begin{center}
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{attachments/test01.jpg}
+        \vspace{0.2cm}
+        \textbf{Ảnh mẫu thử nghiệm 2}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{attachments/test01_caption.jpg}
+        \vspace{0.2cm}
+        \textbf{Chú thích được tạo ra cho ảnh mẫu 2}
+    \end{minipage}
+\end{center}
+
+\subsection{Phân tích kết quả}
+Từ các kết quả thử nghiệm trên, chúng ta có thể thấy mô hình đã học được cách tạo ra chú thích phù hợp cho các ảnh đầu vào. Mô hình có khả năng nhận diện các đối tượng chính trong ảnh và mô tả hành động của chúng một cách chính xác. Tuy nhiên, vẫn có một số trường hợp mô hình chưa mô tả đầy đủ hoặc chính xác hoàn toàn chi tiết trong ảnh, cho thấy còn dư địa để cải thiện trong tương lai.
 \section{Kết luận}
 
 \begin{thebibliography}{00}
