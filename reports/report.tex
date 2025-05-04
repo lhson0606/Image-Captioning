@@ -72,17 +72,62 @@ Show and Tell \cite{show_tell} là mô hình sớm hơn sử dụng kiến trúc
     \label{fig:model}
 \end{figure}
 \subsubsection{Encoder}
-Chúng tôi sẽ sử dụng một mạng CNN để trích xuất đặc trưng từ ảnh đầu vào. Các đặc trưng này sẽ được sử dụng trong cơ chế chú ý và bộ giải mã để tạo ra mô tả.\\
-Ở đây chúng tôi sẽ sử dụng ResNet-101 để trích xuất đặc trưng từ ảnh. ResNet-101 là một mạng nơ-ron tích chập sâu với 101 lớp, giúp cải thiện khả năng học và giảm thiểu vấn đề biến mất gradient. Chúng tôi sẽ sử dụng các lớp cuối cùng của ResNet-101 để lấy đặc trưng cho ảnh đầu vào.
+Chúng tôi sử dụng mô hình ResNet-101 đã được tiền huấn luyện làm bộ mã hóa để trích xuất đặc trưng từ ảnh đầu vào. Cụ thể:
+\begin{itemize}
+    \item Loại bỏ hai lớp cuối cùng của ResNet-101 (lớp fully-connected và lớp pooling) vì chúng tôi chỉ cần các đặc trưng chứ không cần phân loại ảnh
+    \item Sử dụng Adaptive Average Pooling để chuẩn hóa kích thước đầu ra thành $14 \times 14$
+    \item Đầu ra có kích thước $(batch\_size, 2048, 14, 14)$ sau đó được chuyển thành $(batch\_size, 14, 14, 2048)$ để phù hợp với bộ giải mã
+    \item Cho phép tinh chỉnh (fine-tune) các khối tích chập từ 5 trở đi khi cần thiết
+\end{itemize}
 
 \subsubsection{Attention}
 Cài đặt cơ chế chú ý bằng các lớp tuyến tính đơn giản để mô hình học cách tập trung vào các phần quan trọng của ảnh khi tạo từng từ.\\
 Theo như tác giả Show, Attend and Tell, chúng tôi sẽ sử dụng cơ chế chú ý mềm (soft attention) để tính toán trọng số cho các phần khác nhau của ảnh. Cơ chế chú ý này sẽ giúp mô hình xác định vùng nào của ảnh là quan trọng nhất cho từng từ trong câu mô tả.\\
 Cơ chế chú ý sẽ được thực hiện bằng cách sử dụng một lớp tuyến tính để tính toán trọng số cho các đặc trưng của ảnh, sau đó kết hợp chúng với đầu vào của bộ giải mã. Trọng số này sẽ được cập nhật trong quá trình huấn luyện để tối ưu hóa mô hình.
+Cơ chế chú ý được triển khai gồm các thành phần:
+\begin{itemize}
+    \item Ba lớp tuyến tính để biến đổi:
+    \begin{itemize}
+        \item Đặc trưng ảnh $(encoder\_att)$
+        \item Trạng thái ẩn của bộ giải mã $(decoder\_att)$
+        \item Kết hợp thông tin để tính trọng số chú ý $(full\_att)$
+    \end{itemize}
+    \item Hàm kích hoạt ReLU và Softmax để tính trọng số chú ý
+    \item Đầu vào: Đặc trưng ảnh $(encoder\_out)$ và trạng thái ẩn hiện tại của bộ giải mã $(decoder\_hidden)$
+    \item Đầu ra: Mã hóa có trọng số chú ý $(attention\_weighted\_encoding)$ và ma trận trọng số chú ý $(\alpha)$
+\end{itemize}
 
 \subsubsection{Decoder}
-Sử dụng Long Short-Term Memory (LSTM) để tạo ra câu mô tả từ các đặc trưng đã được trích xuất và thông tin chú ý.
+Bộ giải mã sử dụng LSTM với cơ chế chú ý gồm các thành phần chính:
+\begin{itemize}
+    \item Khởi tạo trạng thái ẩn $(h, c)$ từ đặc trưng ảnh trung bình
+    \item Lớp embedding để chuyển từ ngữ cảnh thành vector
+    \item Tế bào LSTM $(LSTMCell)$ xử lý kết hợp:
+    \begin{itemize}
+        \item Embedding của từ hiện tại
+        \item Mã hóa có trọng số chú ý
+    \end{itemize}
+    \item Cổng điều chỉnh $(f\_beta$ với $sigmoid)$ để kiểm soát ảnh hưởng của cơ chế chú ý
+    \item Lớp fully-connected cuối cùng để dự đoán từ tiếp theo
+    \item Quy trình hoạt động:
+    \begin{itemize}
+        \item Sắp xếp dữ liệu theo độ dài chú thích giảm dần
+        \item Với mỗi bước thời gian:
+        \begin{itemize}
+            \item Tính trọng số chú ý và mã hóa có trọng số
+            \item Cập nhật trạng thái LSTM
+            \item Dự đoán từ tiếp theo
+        \end{itemize}
+        \item Chỉ xử lý các mẫu còn hoạt động (chưa kết thúc)
+    \end{itemize}
+\end{itemize}
 
+Các kỹ thuật hỗ trợ:
+\begin{itemize}
+    \item Dropout để tránh overfitting
+    \item Khởi tạo trọng số đồng đều trong khoảng $[-0.1, 0.1]$
+    \item Xử lý độ dài thay đổi của chú thích
+\end{itemize}
 \subsection{Hàm mất mát}
 Hàm mất mát được sử dụng trong mô hình này là hàm mất mát chéo entropy, giúp đo lường sự khác biệt giữa phân phối xác suất dự đoán và phân phối xác suất thực tế. Hàm mất mát này sẽ được tối ưu hóa trong quá trình huấn luyện để cải thiện độ chính xác của mô hình.
 

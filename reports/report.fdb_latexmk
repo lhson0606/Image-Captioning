@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1746284620.23363 "i:/Repos/Python/Image Captioning/reports/report.tex" "report.pdf" "report" 1746284621.11189 0
+["pdflatex"] 1746342254.56005 "i:/Repos/Python/Image Captioning/reports/report.tex" "report.pdf" "report" 1746342255.47103 0
   "C:/Users/lehoa/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1746000452 89969 e95579120a3aa0ebc21d2737ca2ba701 ""
   "C:/Users/lehoa/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1715642922 24215475 d43fed675318bea12dcdcb26fe3e49f0 ""
   "I:/Application/MikTex/fonts/enc/dvips/vntex/t5.enc" 1368738347 7824 21ade6c3c7fd67cb4ace8dbc91c53118 ""
@@ -30,6 +30,9 @@
   "I:/Application/MikTex/fonts/tfm/vntex/urwvn/utmr8v.tfm" 1124904812 9148 527b0537918dbea3d17ce87083d502f6 ""
   "I:/Application/MikTex/fonts/tfm/vntex/urwvn/utmrc8v.tfm" 1124904812 13268 4823fc83b0d556e638bb7164ef28561a ""
   "I:/Application/MikTex/fonts/tfm/vntex/urwvn/utmri8v.tfm" 1124904812 9008 675f1fda1424847c1472fe17c01a2c25 ""
+  "I:/Application/MikTex/fonts/type1/public/amsfonts/cm/cmmi10.pfb" 1247596667 36299 5f9df58c2139e7edcf37c8fca4bd384d ""
+  "I:/Application/MikTex/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1247596667 35752 024fb6c41858982481f6968b5fc26508 ""
+  "I:/Application/MikTex/fonts/type1/public/amsfonts/cm/cmsy10.pfb" 1247596667 32569 5e5ddc8df908dea60932f3c484a54c0d ""
   "I:/Application/MikTex/fonts/type1/public/amsfonts/cm/cmsy7.pfb" 1247596666 32716 08e384dc442464e7285e891af9f45947 ""
   "I:/Application/MikTex/fonts/type1/vntex/urwvn/utmb8v.pfb" 1124904812 72608 04a6dd2cf0a046ace7cda60190a4e864 ""
   "I:/Application/MikTex/fonts/type1/vntex/urwvn/utmbi8v.pfb" 1124904812 72494 cf825f19d8ec4210c2772fe32c09927e ""
@@ -90,9 +93,9 @@
   "attachments/test00_caption.jpg" 1746284441 130213 4d976e04cfbfdcb16a88379f5fdd447f ""
   "attachments/test01.jpg" 1746283938 129688 50a1487730c93d0ca9cc1dffdcbfa3a7 ""
   "attachments/test01_caption.jpg" 1746284038 108018 c989f960098c07b00e4208dd1801497b ""
-  "i:/Repos/Python/Image Captioning/reports/report.tex" 1746284618 14570 585895c3e9c051f7cfab19f3cfcce04c ""
-  "report.aux" 1746284621 4045 fffc85e39b65bb02678a4ae9ede7a44a "pdflatex"
-  "report.tex" 1746284618 14570 585895c3e9c051f7cfab19f3cfcce04c ""
+  "i:/Repos/Python/Image Captioning/reports/report.tex" 1746342254 16806 390e3dd84c55fa3e46f134a73762ab7f ""
+  "report.aux" 1746342255 4045 d79266248ff62a473c279590015ff3a0 "pdflatex"
+  "report.tex" 1746342254 16806 390e3dd84c55fa3e46f134a73762ab7f ""
   (generated)
   "report.aux"
   "report.log"
