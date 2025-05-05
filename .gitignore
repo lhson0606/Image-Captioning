@@ -1,6 +1,12 @@
 # additional folders
 _data/
 checkpoints/
+# report
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.gz
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
